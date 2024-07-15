@@ -1,4 +1,4 @@
-#include "md5.hpp"
+#include "../include/md5.hpp"
 
 hash_md5::hash_md5(char* hash) {
 
@@ -78,13 +78,17 @@ std::string* hash_md5::get_hash() {
 void hash_md5::pad_hash() {
 
     int bytesToAdd = (*this->padded_size -  *this->size)/8; 
-
     char tmp = 128;
     this->padded_message[std::strlen(this->message)] =  tmp;
 
+    for(int i = 1; i < bytesToAdd; i++) {
+        this->padded_message[std::strlen(this->message) + i] = 0;
+    }
+   
     for(int i = 0; i < 8; i++) {
         tmp = (*this->size >> (i*8));
         (this->padded_message)[std::strlen(this->message)  + bytesToAdd - 7 + i-1] = tmp;
+            
     }
 
 }
@@ -154,7 +158,7 @@ void hash_md5::rounds(message_block* block, K* k){
             _word |= ((u_int)words[index_i(j*16+i)][3]) << 24;
 
             u_int tmp_B = (_A + _F + k->get_k()[j*16+i] + _word) & 0xFFFFFFFF;
-            //std::cout << std::hex << ((_A + _F + k->get_k()[j*16+i] + _word) & 0xFFFFFFFF) << std::endl;
+            //std::cout << std::hex << block->get_block() << std::endl;
             _B = (left_rotate(tmp_B , r[j][i]) + _B) & 0xFFFFFFFF;
             
             _A = tmp;
@@ -174,15 +178,20 @@ void hash_md5::rounds(message_block* block, K* k){
 
 void hash_md5::concat_hash(){
     std::stringstream ss;
-    
-    ss << std::hex << revert(*this->A) << revert(*this->B)<< revert(*this->C) << revert(*this->D);
+   
+    ss << std::setw(8) << std::setfill('0') << std::hex << revert(*this->A);
+    ss << std::setw(8) << std::setfill('0') << std::hex << revert(*this->B);
+    ss << std::setw(8) << std::setfill('0') << std::hex << revert(*this->C);
+    ss << std::setw(8) << std::setfill('0') << std::hex << revert(*this->D);
     *this->hash = ss.str();
 }
 
 
 void hash_md5::hash_message() {
+
     this->pad_hash();
     this->split_message();
+
 
     for(int i = 0; i < *this->size_blocks; i++) {
         this->message_blocks[i]->split_block();
@@ -193,5 +202,6 @@ void hash_md5::hash_message() {
     }
 
     this->concat_hash();
+
 
 }

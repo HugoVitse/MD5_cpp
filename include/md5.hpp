@@ -34,6 +34,9 @@ char* messageHandler(char* args[], int nb_args);
 
 char* inputMessage();
 
+std::ostream& printBinary(std::ostream& os, const u_char* arr, int size);
+std::ostream& printBinary(std::ostream& os, const char* arr, int size);
+
 
 class K {
 

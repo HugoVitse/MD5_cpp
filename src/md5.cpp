@@ -1,7 +1,4 @@
-#include "hash_md5.cpp"
-#include "message_block.cpp"
-#include "K.cpp"
-#include "functions.cpp"
+#include "md5.hpp"
 
 int main(int argc, char* argv[]) {
    
