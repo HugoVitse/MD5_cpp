@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD 14)
 include_directories(include)
 
 # Ajouter les fichiers source
-add_executable(MD5 src/md5.cpp)
+add_executable(MD5 main.cpp)
 add_subdirectory(src)
 target_link_libraries(MD5 md5)
 

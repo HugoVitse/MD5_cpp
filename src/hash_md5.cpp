@@ -1,79 +1,15 @@
-#include "../include/md5.hpp"
+#include "../include/hash.hpp"
 
-hash_md5::hash_md5(char* hash) {
+hash_md5::hash_md5(char* message) : hash(message) {
 
-    this->message = new char[std::strlen(hash) + 1];
-    std::strcpy(this->message, hash);
-
-    this->hash = new std::string("");
-
-    this->size = new uint64_t(std::strlen(hash)*8);
-
-
-    int tmp = *this->size + 1;
-
-    while(tmp % 512 != 448) {
-        tmp+=1;
-    }
-
-    this->padded_size = new int(tmp+sizeof(uint64_t)*8);
-
-    if(*this->padded_size % 512 != 0) {
-        throw InccorectSize("Incorrect size");
-    }
-
-    this->padded_message = new char[ (*this->padded_size)/8 + 1 ]; 
-    std::strcpy(this->padded_message, hash); 
-
-    this->message_blocks = new message_block*[(*this->padded_size)/512];
-
-    this->size_blocks = new int((*this->padded_size)/512);
-
-    this->A = new u_int(A_init);
-    this->B = new u_int(B_init);
-    this->C = new u_int(C_init);
-    this->D = new u_int(D_init);
-
+    this->IV = new u_int*[hash_md5::IV_SIZE];
+    this->IV[0] = new u_int(A_init);
+    this->IV[1] = new u_int(B_init);
+    this->IV[2] = new u_int(C_init);
+    this->IV[3] = new u_int(D_init);
+    
 }
 
-
-hash_md5::~hash_md5() {
-    delete this->hash;
-    delete this->hash;
-    delete this->size;
-    delete this->padded_message;
-    delete this->padded_size;
-    delete this->message_blocks;
-    delete this->size_blocks;
-    delete this->A;
-    delete this->B;
-    delete this->C;
-    delete this->D;
-}
-
-char* hash_md5::get_message() {
-    return this->message;
-}
-
-char* hash_md5::get_padded_message() {
-    return this->padded_message;
-}
-
-uint64_t* hash_md5::get_size() {
-    return this->size;
-}
-
-int* hash_md5::get_padded_size() {
-    return this->padded_size;
-}   
-
-message_block** hash_md5::get_message_blocks() {
-    return this->message_blocks;
-}
-
-std::string* hash_md5::get_hash() {
-    return this->hash;
-}
 
 void hash_md5::pad_hash() {
 
@@ -93,23 +29,15 @@ void hash_md5::pad_hash() {
 
 }
 
-void hash_md5::split_message() {
+void hash_md5::rounds(message_block* block) {
+    u_int* words = block->get_words();
 
-    u_char* tmp = new u_char[512/8];
-    for(int i = 0; i < (*this->padded_size)/512; i++) {
-        std::memcpy(tmp, this->padded_message + i*512/8, 512/8);
-        this->message_blocks[i] = new message_block(tmp, i);
-    }
-}
+    K_MD5* k = new K_MD5();
 
-void hash_md5::rounds(message_block* block, K* k){
-    u_char** words = block->get_words();
-
-
-    u_int _A = *this->A;
-    u_int _B = *this->B;
-    u_int _C = *this->C;
-    u_int _D = *this->D;
+    u_int _A = *this->IV[0];
+    u_int _B = *this->IV[1];
+    u_int _C = *this->IV[2];
+    u_int _D = *this->IV[3];
 
 
 
@@ -149,13 +77,7 @@ void hash_md5::rounds(message_block* block, K* k){
             _C = _B;
             u_int _word = 0;
 
-            _word |= (u_int)words[index_i(j*16+i)][0];
-        
-            _word |= ((u_int)words[index_i(j*16+i)][1]) << 8;
-
-            _word |= ((u_int)words[index_i(j*16+i)][2]) << 16;
- 
-            _word |= ((u_int)words[index_i(j*16+i)][3]) << 24;
+            _word = revert(words[index_i(j*16+i)]);
 
             u_int tmp_B = (_A + _F + k->get_k()[j*16+i] + _word) & 0xFFFFFFFF;
             //std::cout << std::hex << block->get_block() << std::endl;
@@ -169,39 +91,28 @@ void hash_md5::rounds(message_block* block, K* k){
 
     }
 
-    *this->A = (*this->A + _A);
-    *this->B = (*this->B + _B);
-    *this->C = (*this->C + _C);
-    *this->D = (*this->D + _D);
-
+    *this->IV[0] +=  _A;
+    *this->IV[1] +=  _B;
+    *this->IV[2] +=  _C;
+    *this->IV[3] +=  _D;
 }
+
+void hash_md5::split_message() {
+
+    u_char* tmp = new u_char[512/8];
+    for(int i = 0; i < (*this->padded_size)/512; i++) {
+        std::memcpy(tmp, this->padded_message + i*512/8, 512/8);
+        this->message_blocks[i] = new message_block(tmp, i, hash_md5::NB_WORDS);
+    }
+}
+
 
 void hash_md5::concat_hash(){
     std::stringstream ss;
+
+    for(int i = 0; i < hash_md5::IV_SIZE; i++) {
+        ss << std::setw(8) << std::setfill('0') << std::hex << revert(*this->IV[i]);
+    }
    
-    ss << std::setw(8) << std::setfill('0') << std::hex << revert(*this->A);
-    ss << std::setw(8) << std::setfill('0') << std::hex << revert(*this->B);
-    ss << std::setw(8) << std::setfill('0') << std::hex << revert(*this->C);
-    ss << std::setw(8) << std::setfill('0') << std::hex << revert(*this->D);
-    *this->hash = ss.str();
-}
-
-
-void hash_md5::hash_message() {
-
-    this->pad_hash();
-    this->split_message();
-
-
-    for(int i = 0; i < *this->size_blocks; i++) {
-        this->message_blocks[i]->split_block();
-    }
-
-    for(int i = 0; i < *this->size_blocks; i++) {
-        this->rounds(this->message_blocks[i], new K());
-    }
-
-    this->concat_hash();
-
-
+    *this->message_hashed = ss.str();
 }
