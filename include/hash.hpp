@@ -1,3 +1,4 @@
+
 #include <string>
 #include <cstdint>
 #include <stdio.h>
@@ -11,231 +12,56 @@
 
 #pragma once
 
-#define A_init 0x67452301
-#define B_init 0xefcdab89
-#define C_init 0x98badcfe
-#define D_init 0x10325476
+namespace MD5_Const {
 
-#define H0_init 0x6a09e667
-#define H1_init 0xbb67ae85
-#define H2_init 0x3c6ef372
-#define H3_init 0xa54ff53a
-#define H4_init 0x510e527f
-#define H5_init 0x9b05688c
-#define H6_init 0x1f83d9ab
-#define H7_init 0x5be0cd19
+    constexpr u_int A_init = 0x67452301;
+    constexpr u_int B_init = 0xefcdab89;
+    constexpr u_int C_init = 0x98badcfe;
+    constexpr u_int D_init = 0x10325476;
 
-//MD5 functions
-u_int F(u_int X, u_int Y, u_int Z);
+}
 
-u_int G(u_int X, u_int Y, u_int Z);
+namespace SHA256_Const {
 
-u_int H(u_int X, u_int Y, u_int Z);
+    constexpr u_int H0_init = 0x6a09e667;
+    constexpr u_int H1_init = 0xbb67ae85;
+    constexpr u_int H2_init = 0x3c6ef372;
+    constexpr u_int H3_init = 0xa54ff53a;
+    constexpr u_int H4_init = 0x510e527f;
+    constexpr u_int H5_init = 0x9b05688c;
+    constexpr u_int H6_init = 0x1f83d9ab;
+    constexpr u_int H7_init = 0x5be0cd19;
 
-u_int I(u_int X, u_int Y, u_int Z);
+}
 
-//SHA256 functions
+namespace SHA224_Const {
 
-u_int CH(u_int X, u_int Y, u_int Z);
+    constexpr u_int H0_init = 0xc1059ed8;
+    constexpr u_int H1_init = 0x367cd507;
+    constexpr u_int H2_init = 0x3070dd17;
+    constexpr u_int H3_init = 0xf70e5939;
+    constexpr u_int H4_init = 0xffc00b31;
+    constexpr u_int H5_init = 0x68581511;
+    constexpr u_int H6_init = 0x64f98fa7;
+    constexpr u_int H7_init = 0xbefa4fa4;
 
-u_int MAJ(u_int X, u_int Y, u_int Z);
+}
 
-u_int SIGMA_0(u_int X);
+namespace SHA512_Const {
 
-u_int SIGMA_1(u_int X);
+    constexpr u_int64_t H0_init = 0x6a09e667f3bcc908;
+    constexpr u_int64_t H1_init = 0xbb67ae8584caa73b;
+    constexpr u_int64_t H2_init = 0x3c6ef372fe94f82b;
+    constexpr u_int64_t H3_init = 0xa54ff53a5f1d36f1;
+    constexpr u_int64_t H4_init = 0x510e527fade682d1;
+    constexpr u_int64_t H5_init = 0x9b05688c2b3e6c1f;
+    constexpr u_int64_t H6_init = 0x1f83d9abfb41bd6b;
+    constexpr u_int64_t H7_init = 0x5be0cd19137e2179;
 
-u_int sigma_0(u_int X);
-
-u_int sigma_1(u_int X);
-
-//Utils functions
-int index_i(int i);
-
-u_int left_rotate(u_int X, int n);
-u_int right_rotate(u_int X, int n);
-
-u_int revert(u_int X);
-
-char* messageHandler(char* args[], int nb_args);
-
-char* inputMessage();
+}
 
 u_int* getPrimeNumber(u_int n);
 
-bool isPrime(u_int n);
 
-std::ostream& printBinary(std::ostream& os, const u_char* arr, int size);
-std::ostream& printBinary(std::ostream& os, const char* arr, int size);
-void printBinary(const u_int* arr, int size);
-
-class K {
-
-public:
-
-    K();
-    ~K();
-    const uint* get_k();
-
-protected:
-
-    const uint* k;
-
-};
-
-class K_MD5 : public K {
-
-public:
-
-    K_MD5();
-
-};
-
-class K_SHA2 : public K {
-
-public:
-
-    K_SHA2();
-
-};
-
-class message_block {
-
-public:
-    
-    message_block();
-
-    message_block(u_char* block, int id, int nb_words);
-
-    ~message_block();
-
-    u_char* get_block();
-
-    int get_id();
-
-    u_int* get_words();
-
-    void split_block();
-    
-
-private:
-
-    u_char* block;
-    int id;
-    u_int* words;
-    int size;
-};
-
-
-class hash {
-
-public:
-
-    hash(char* message);
-
-    ~hash();
-
-    char* get_message();
-
-    char* get_padded_message();
-
-    uint64_t* get_size();
-
-    int* get_padded_size();
-
-    message_block** get_message_blocks();
-
-    virtual void pad_hash() = 0;
-
-    void hash_message();
-
-    virtual void split_message() = 0;
-
-    virtual void rounds(message_block* block) = 0;
-
-    virtual void concat_hash() = 0;
-
-    std::string* get_hash();
-
-protected:
-    char* message;
-    std::string* message_hashed;
-    uint64_t* size;
-    char* padded_message;
-    int* padded_size;
-    message_block** message_blocks;
-    int* nb_blocks;
-    u_int** IV;
-};
-
-
-class hash_md5 : public hash{
-    
-public:
-
-    hash_md5(char* message);
-
-    void rounds(message_block* block) override;
-
-    void concat_hash() override;
-
-    void split_message() override;
-
-    void pad_hash() override;
-
-private :
-    static const int NB_WORDS = 16;
-    static const int IV_SIZE = 4;
-
-};
-
-class hash_sha256 : public hash{
-    
-public:
-
-    hash_sha256(char* message);
-
-    void rounds(message_block* block) override;
-
-    void concat_hash() override;
-
-    void split_message() override;
-
-    void pad_hash() override;
-
-private :
-    static const int NB_WORDS = 16;
-    static const int IV_SIZE = 8;
-
-};
-
-
-
-class InccorectSize : public std::exception {
-
-private:
-    std::string message;
-
-public:
-    InccorectSize(const std::string& msg) : message(msg) {}
-
-    // Méthode virtuelle qui retourne la description de l'exception
-    const char* what() const noexcept override {
-        return message.c_str();
-    }
-};
-
-
-
-class InccorectArgs : public std::exception {
-
-private:
-    std::string message;
-
-public:
-    InccorectArgs(const std::string& msg) : message(msg) {}
-
-    // Méthode virtuelle qui retourne la description de l'exception
-    const char* what() const noexcept override {
-        return message.c_str();
-    }
-};
+#include "classes.hpp"
+#include "functions.hpp"

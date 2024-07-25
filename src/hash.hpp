@@ -1,39 +1,21 @@
 #include "../include/hash.hpp"
 
-hash::hash(char* hash) {
+
+template<typename T>
+hash<T>::hash(char* hash) {
+    using message_block = message_block<T>;
 
     this->message = new char[std::strlen(hash) + 1];
     std::strcpy(this->message, hash);
 
     this->message_hashed = new std::string("");
 
-    this->size = new uint64_t(std::strlen(hash)*8);
-
-
-    int tmp = *this->size + 1;
-
-    while(tmp % 512 != 448) {
-        tmp+=1;
-    }
-
-    this->padded_size = new int(tmp+sizeof(uint64_t)*8);
-
-    if(*this->padded_size % 512 != 0) {
-        throw InccorectSize("Incorrect size");
-    }
-
-    this->padded_message = new char[ (*this->padded_size)/8 + 1 ]; 
-    std::strcpy(this->padded_message, hash); 
-
-    this->message_blocks = new message_block*[(*this->padded_size)/512];
-
-    this->nb_blocks = new int((*this->padded_size)/512);
-
+    this->size = new __uint128_t(std::strlen(hash)*8);
 
 }
 
-
-hash::~hash() {
+template<typename T>
+hash<T>::~hash() {
     delete this->message_hashed;
     delete this->size;
     delete this->padded_message;
@@ -43,31 +25,38 @@ hash::~hash() {
     delete this->IV;
 }
 
-char* hash::get_message() {
+template<typename T>
+char* hash<T>::get_message() {
     return this->message;
 }
 
-char* hash::get_padded_message() {
+template<typename T>
+char* hash<T>::get_padded_message() {
     return this->padded_message;
 }
 
-uint64_t* hash::get_size() {
+template<typename T>
+__uint128_t* hash<T>::get_size() {
     return this->size;
 }
 
-int* hash::get_padded_size() {
+template<typename T>
+int* hash<T>::get_padded_size() {
     return this->padded_size;
 }   
 
-message_block** hash::get_message_blocks() {
+template<typename T>
+message_block<T>** hash<T>::get_message_blocks() {
     return this->message_blocks;
 }
 
-std::string* hash::get_hash() {
+template<typename T>
+std::string* hash<T>::get_hash() {
     return this->message_hashed;
 }
 
-void hash::pad_hash() {
+template<typename T>
+void hash<T>::pad_hash() {
 
     int bytesToAdd = (*this->padded_size -  *this->size)/8; 
     char tmp = 128;
@@ -85,8 +74,10 @@ void hash::pad_hash() {
 
 }
 
-void hash::hash_message() {
+template<typename T>
+void hash<T>::hash_message() {
 
+    this->init_iv();
     this->pad_hash();
     this->split_message();
 
