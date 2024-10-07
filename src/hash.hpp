@@ -56,6 +56,12 @@ std::string* hash<T>::get_hash() {
 }
 
 template<typename T>
+void hash<T>::set_message(char* messsage) {
+    this->message = message;
+}
+
+
+template<typename T>
 void hash<T>::pad_hash() {
 
     int bytesToAdd = (*this->padded_size -  *this->size)/8; 

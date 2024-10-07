@@ -176,6 +176,8 @@ public:
 
     virtual void pad_hash() = 0;
 
+    void set_message(char* message);
+
     void hash_message();
 
     virtual void split_message() = 0;
@@ -274,6 +276,19 @@ class hash_sha224 : public hash_sha256 {
 
 public:
     hash_sha224(char* message);
+
+    void init_iv() override;
+
+    void concat_hash() override;
+
+private:
+    static const int IV_SIZE = 8;
+};
+
+class hash_sha384 : public hash_sha512 {
+
+public:
+    hash_sha384(char* message);
 
     void init_iv() override;
 

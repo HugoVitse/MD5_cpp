@@ -12,6 +12,10 @@ add_executable(MD5 main.cpp)
 add_subdirectory(src)
 target_link_libraries(MD5 md5)
 
+add_executable(bruteforce brute.cpp)
+target_link_libraries(bruteforce md5)
+
+
 # Activer les tests
 enable_testing()
 
