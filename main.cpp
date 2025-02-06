@@ -1,8 +1,17 @@
 #include "include/hash.hpp" 
 
 int main(int argc, char* argv[]) {
+
+    char* message;
+    try {
+        message = messageHandler(argv, argc);
+    } 
+    catch (const InccorectArgs& e) {
+        std::cout << e.what() << std::endl;
+        return EXIT_FAILURE;
+    }
    
-    char* message = messageHandler(argv, argc);
+    
 
     hash_md5* hashMD5 = new hash_md5(message);
     hash_sha256* hashSHA256 = new hash_sha256(message);
@@ -17,7 +26,7 @@ int main(int argc, char* argv[]) {
     hashSHA384->hash_message();
 
 
-    std::cout << "MD5 : " << *hashMD5->get_hash() << std::endl <<
+    std::cout << "MD5    : " << *hashMD5->get_hash()    << std::endl <<
                  "SHA256 : " << *hashSHA256->get_hash() << std::endl << 
                  "SHA224 : " << *hashSHA224->get_hash() << std::endl << 
                  "SHA512 : " << *hashSHA512->get_hash() << std::endl << 
@@ -29,5 +38,7 @@ int main(int argc, char* argv[]) {
     delete hashSHA224;
     delete hashSHA512;
     delete hashSHA384;
+
+    return EXIT_SUCCESS;
 }
 
