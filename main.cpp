@@ -21,7 +21,7 @@ int main(int argc, char* argv[]) {
                  "SHA256 : " << *hashSHA256->get_hash() << std::endl << 
                  "SHA224 : " << *hashSHA224->get_hash() << std::endl << 
                  "SHA512 : " << *hashSHA512->get_hash() << std::endl << 
-                 "SHA384 : " << *hashSHA384->get_hash();
+                 "SHA384 : " << *hashSHA384->get_hash() << std::endl;
 
 
     delete hashMD5;

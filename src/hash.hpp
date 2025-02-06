@@ -2,7 +2,7 @@
 
 
 template<typename T>
-hash<T>::hash(char* hash) {
+hash<T>::hash(const char* hash) {
     using message_block = message_block<T>;
 
     this->message = new char[std::strlen(hash) + 1];

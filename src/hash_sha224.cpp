@@ -1,7 +1,7 @@
 #include "../include/hash.hpp"
 
 
-hash_sha224::hash_sha224(char* message) : hash_sha256(message) {
+hash_sha224::hash_sha224(const char* message) : hash_sha256(message) {
 
     
 }

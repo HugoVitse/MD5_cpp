@@ -1,6 +1,6 @@
 #include "../include/hash.hpp"
 
-hash_sha512::hash_sha512(char* message) : hash<u_int64_t>(message) {
+hash_sha512::hash_sha512(const char* message) : hash<u_int64_t>(message) {
 
     using Word = Word<u_int64_t>;
 

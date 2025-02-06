@@ -158,7 +158,7 @@ class hash {
 
 public:
 
-    hash(char* message);
+    hash(const char* message);
 
     ~hash();
 
@@ -207,7 +207,7 @@ class hash_md5 : public hash<u_int>{
     
 public:
 
-    hash_md5(char* message);
+    hash_md5(const char* message);
 
     void init_iv() override;
 
@@ -230,7 +230,7 @@ class hash_sha256 : public hash<u_int>{
     
 public:
 
-    hash_sha256(char* message);
+    hash_sha256(const char* message);
 
     void init_iv() override;
 
@@ -253,7 +253,7 @@ class hash_sha512 : public hash<u_int64_t>{
     
 public:
 
-    hash_sha512(char* message);
+    hash_sha512(const char* message);
 
     void init_iv() override;
 
@@ -275,7 +275,7 @@ private :
 class hash_sha224 : public hash_sha256 {
 
 public:
-    hash_sha224(char* message);
+    hash_sha224(const char* message);
 
     void init_iv() override;
 
@@ -288,7 +288,7 @@ private:
 class hash_sha384 : public hash_sha512 {
 
 public:
-    hash_sha384(char* message);
+    hash_sha384(const char* message);
 
     void init_iv() override;
 
